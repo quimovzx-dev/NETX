@@ -1,0 +1,4 @@
+import {NextRequest,NextResponse} from "next/server";
+export const runtime="nodejs";
+function clean(html:string){return html.replace(/<script[\\s\\S]*?<\\/script>/gi," ").replace(/<style[\\s\\S]*?<\\/style>/gi," ").replace(/<[^>]+>/g," ").replace(/\\s+/g," ").trim()}
+export async function GET(req:NextRequest){const q=req.nextUrl.searchParams.get("q")?.trim();if(!q)return NextResponse.json({error:"Missing q"},{status:400});try{const u="https://html.duckduckgo.com/html/?q="+encodeURIComponent(q);const r=await fetch(u,{headers:{"user-agent":"NETX-Web/1.0"},cache:"no-store"});const html=await r.text();const items=[...html.matchAll(/result__a[^>]*href="([^"]+)"[^>]*>([\\s\\S]*?)<\\/a>/gi)].slice(0,10).map((m,i)=>({id:i+1,title:clean(m[2]),url:m[1],summary:"Web result returned by NETX search."}));return NextResponse.json({query:q,results:items});}catch(e){return NextResponse.json({error:"Research request failed"},{status:502})}}
