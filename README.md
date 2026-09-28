@@ -1,35 +1,24 @@
 # NETX — Internet Intelligence Engine
 
-NETX v0.3 adds a lightweight intelligence layer while remaining phone-friendly.
+NETX v0.4 adds multi-query research, topic clustering and a phone-friendly local dashboard.
 
 ## Features
+- Multi-query expansion
 - Parallel web research
-- 24-hour URL cache
-- Query-aware ranking
-- Extractive summaries
-- Entity extraction
-- Knowledge graph generation
+- Entity extraction + knowledge graph
+- Topic clustering
 - Cross-source comparison
-- Local SQLite search
-- Research history/statistics
+- 24-hour cache
+- Local research search
 - JSON + HTML reports
-- Built-in local REST API
+- Phone-friendly local dashboard
 - No AI API key required
 
 ## Run
 ```bash
-python -m pip install -r requirements.txt
 python main.py
 ```
 
-## Commands
-```
-/history
-/stats
-/local smartphone
-/api
-/help
-/exit
-```
+Commands: `/history`, `/stats`, `/local <term>`, `/dashboard`, `/help`, `/exit`.
 
-API endpoints: `/health`, `/stats`, `/history`, `/search?q=term`
+Use `/dashboard` and open the displayed address in your phone browser.
