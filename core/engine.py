@@ -6,7 +6,7 @@ from core.dedup import deduplicate
 from core.ranking import rank_results
 from core.summarizer import summarize
 from core.entities import extract_entities
-from core.graph import build_graph
+from core.graph import build_graph,export_graph
 from core.compare import compare
 from core.multiquery import expand_query
 from core.clustering import cluster
@@ -32,8 +32,8 @@ def run(query,project=None):
  with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
   jobs={pool.submit(_enrich,x):x for x in results}
   for n,f in enumerate(as_completed(jobs),1):
-   x=f.result();print(f"    [{n}/{len(results)}] {'cached' if x.get('cached') else 'fetched'}: {x.get('title','')[:65]}");enriched.append(x)
- print("[4/10] Removing duplicates...");cleaned=deduplicate(enriched);print("[5/10] Ranking sources...");ranked=rank_results(cleaned,query);print("[6/10] Building knowledge graph...");graph=build_graph(ranked);print("[7/10] Comparing sources + clustering...");comparison=compare(ranked);topics=cluster(ranked);print("[8/10] Saving to SQLite...");save_results(query,ranked)
+   x=f.result();print(f"    [{n}/{len(jobs)}] {'cached' if x.get('cached') else 'fetched'}: {x.get('title','')[:65]}");enriched.append(x)
+ print("[4/10] Removing duplicates...");cleaned=deduplicate(enriched);print("[5/10] Ranking sources...");ranked=rank_results(cleaned,query);print("[6/10] Building knowledge graph...");graph=build_graph(ranked);export_graph(graph);print("[7/10] Comparing sources + clustering...");comparison=compare(ranked);topics=cluster(ranked);print("[8/10] Saving to SQLite...");save_results(query,ranked)
  if project:add_query(project,query)
  print("[9/10] Exporting reports...");jp=export_json(ranked,query,graph,comparison,topics);hp=export_html(ranked,query,graph,comparison,topics);print("[10/10] Complete.")
  return ranked,jp,hp,graph,comparison,topics
