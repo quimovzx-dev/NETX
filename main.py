@@ -1,67 +1,33 @@
-from config import APP_NAME, VERSION
-from database.db import create_tables, history, stats
+from config import APP_NAME,VERSION
+from database.db import create_tables,history,stats
 from core.engine import run
-
+from core.local_search import search_local
+from api import start_api
 def banner():
-    print(r"""\n╔══════════════════════════════════════════╗
+ print(r'''\n╔══════════════════════════════════════════╗
 ║        NETX — INTERNET INTELLIGENCE     ║
 ║                 ENGINE                   ║
-╚══════════════════════════════════════════╝
-""")
-    print(f"{APP_NAME} v{VERSION}")
-    print("Commands: /history  /stats  /help  /exit\n")
-
-def show_help():
-    print("""\nNETX commands:
-  /history   Show recent research queries
-  /stats     Show database statistics
-  /help      Show commands
-  /exit      Quit NETX
-  Anything else is a research query.
-""")
-
+╚══════════════════════════════════════════╝''');print(f"{APP_NAME} v{VERSION}");print("Commands: /history /stats /local <term> /api /help /exit\n")
 def main():
-    create_tables()
-    banner()
-    while True:
-        query = input("NETX > ").strip()
-        if query.lower() in {"/exit", "exit", "quit", "q"}:
-            print("NETX shutting down.")
-            break
-        if query.lower() == "/help":
-            show_help()
-            continue
-        if query.lower() == "/history":
-            rows = history()
-            if not rows:
-                print("No research history yet.\n")
-            else:
-                print("\nRecent research:")
-                for q, count, created in rows:
-                    print(f"  • {q} ({count} sources) — {created}")
-                print()
-            continue
-        if query.lower() == "/stats":
-            s = stats()
-            print(f"\nSources stored: {s['sources']}")
-            print(f"Queries stored: {s['queries']}")
-            print(f"Unique URL hosts: {s['unique_hosts']}\n")
-            continue
-        if not query:
-            continue
-        try:
-            results, json_path, html_path = run(query)
-            print("\n========== TOP RESULTS ==========")
-            for i, item in enumerate(results, 1):
-                print(f"\n{i}. {item.get('title', 'Untitled')}")
-                print(f"   Type: {item.get('source_type', 'web')}")
-                print(f"   Score: {item.get('score', 0)}")
-                print(f"   Summary: {item.get('summary', '')[:300]}")
-                print(f"   URL: {item.get('url', '')}")
-            print(f"\nJSON report: {json_path}")
-            print(f"HTML report: {html_path}\n")
-        except Exception as exc:
-            print(f"\n[ERROR] {exc}\n")
-
-if __name__ == "__main__":
-    main()
+ create_tables();banner()
+ while True:
+  q=input("NETX > ").strip()
+  if q.lower() in {"/exit","exit","quit","q"}:print("NETX shutting down.");break
+  if q.lower()=="/help":print("\n/history  recent research\n/stats    database stats\n/local X  search saved research\n/api      start local REST API\n/exit     quit\n");continue
+  if q.lower()=="/history":
+   for x in history():print(f"  • {x[0]} ({x[1]} sources) — {x[2]}")
+   print();continue
+  if q.lower()=="/stats":
+   s=stats();print(f"\nSources: {s['sources']}\nQueries: {s['queries']}\nHosts: {s['unique_hosts']}\n");continue
+  if q.lower().startswith("/local "):
+   for x in search_local(q[7:]):print(f"\n{x['title']}\n{x['source_type']} · {x['score']}\n{x['url']}\n{x['summary']}")
+   print();continue
+  if q.lower()=="/api":start_api();continue
+  if not q:continue
+  try:
+   results,jp,hp,graph,comparison=run(q)
+   print("\n========== TOP RESULTS ==========")
+   for i,x in enumerate(results,1):print(f"\n{i}. {x.get('title','Untitled')}\n   Type: {x.get('source_type')}\n   Score: {x.get('score')}\n   Summary: {x.get('summary','')[:300]}\n   Entities: {', '.join(e['name'] for e in x.get('entities',[])[:8])}\n   URL: {x.get('url','')}")
+   print(f"\nGraph: {len(graph['nodes'])} nodes / {len(graph['edges'])} edges");print(f"Reports: {jp} | {hp}\n")
+  except Exception as e:print(f"\n[ERROR] {e}\n")
+if __name__=="__main__":main()
