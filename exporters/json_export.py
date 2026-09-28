@@ -1,14 +1,14 @@
 import json
 import os
-from config import JSON_REPORT
+from datetime import datetime, timezone
+from config import JSON_REPORT, VERSION
 
 def export(results, query):
     os.makedirs(os.path.dirname(JSON_REPORT), exist_ok=True)
     payload = {
-        "engine": "NETX",
-        "version": "0.1.0",
-        "query": query,
-        "results": results,
+        "engine": "NETX", "version": VERSION,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "query": query, "result_count": len(results), "results": results
     }
     with open(JSON_REPORT, "w", encoding="utf-8") as f:
         json.dump(payload, f, indent=2, ensure_ascii=False)
