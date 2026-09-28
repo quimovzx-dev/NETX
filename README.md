@@ -1,19 +1,20 @@
 # NETX — Internet Intelligence Engine
 
-NETX v0.2 is a lightweight Python research engine designed to run on phones.
+NETX v0.3 adds a lightweight intelligence layer while remaining phone-friendly.
 
 ## Features
-- Web search through DuckDuckGo HTML
-- Parallel page fetching
-- SQLite research database
-- 24-hour URL caching
-- Duplicate removal
-- Query-aware relevance scoring
-- Source-type detection
-- Local extractive summaries
+- Parallel web research
+- 24-hour URL cache
+- Query-aware ranking
+- Extractive summaries
+- Entity extraction
+- Knowledge graph generation
+- Cross-source comparison
+- Local SQLite search
+- Research history/statistics
 - JSON + HTML reports
-- Research history and database statistics
-- No external AI API or API key required
+- Built-in local REST API
+- No AI API key required
 
 ## Run
 ```bash
@@ -22,9 +23,13 @@ python main.py
 ```
 
 ## Commands
-```text
+```
 /history
 /stats
+/local smartphone
+/api
 /help
 /exit
 ```
+
+API endpoints: `/health`, `/stats`, `/history`, `/search?q=term`
